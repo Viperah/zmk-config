@@ -1,0 +1,6 @@
+if SHIELD_DIY_MOUSE
+
+config ZMK_KEYBOARD_NAME
+    default "DIY Mouse"
+
+endif
