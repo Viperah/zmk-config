@@ -7,7 +7,7 @@
 
         base {
             bindings = <
-                &kp A
+                &kp A   &kp B   &kp C   &kp D
             >;
         };
     };
