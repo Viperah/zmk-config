@@ -4,17 +4,12 @@
 #include <zephyr/dt-bindings/adc/nrf-saadc.h>
 
 / {
-    aliases {
-        hall-adc = &hall_adc;
-    };
-
     chosen {
         zmk,kscan = &kscan0;
         zmk,matrix-transform = &default_transform;
     };
 
-    hall_adc: hall_adc {
-        status = "okay";
+    zephyr,user {
         io-channels = <&adc 7>;
     };
 

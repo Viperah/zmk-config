@@ -4,10 +4,10 @@
 
 LOG_MODULE_REGISTER(hall_debug, LOG_LEVEL_INF);
 
-#define HALL_ADC_NODE DT_ALIAS(hall_adc)
+#define HALL_ADC_NODE DT_PATH(zephyr_user)
 
-#if !DT_NODE_HAS_STATUS(HALL_ADC_NODE, okay)
-#error "Missing hall-adc devicetree alias"
+#if !DT_NODE_HAS_PROP(HALL_ADC_NODE, io_channels)
+#error "Missing hall ADC io-channel in /zephyr,user"
 #endif
 
 static int16_t sample_buffer;
