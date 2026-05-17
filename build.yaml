@@ -1,4 +1,3 @@
 include:
   - board: "nice_nano//zmk"
     shield: diy_mouse
-    snippet: zmk-usb-logging

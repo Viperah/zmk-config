@@ -1,0 +1,5 @@
+description: Cycle the PAW3395 CPI setting
+
+compatible: "diy,behavior-cpi-cycle"
+
+include: zero_param.yaml

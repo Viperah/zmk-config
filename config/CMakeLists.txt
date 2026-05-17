@@ -1,2 +1,4 @@
 zephyr_library()
 zephyr_library_sources_ifdef(CONFIG_DIY_MOUSE_HALL_DEBUG src/hall_debug.c)
+zephyr_library_sources_ifdef(CONFIG_DIY_MOUSE_HALL_BUTTONS src/hall_buttons.c)
+zephyr_library_sources_ifdef(CONFIG_DIY_MOUSE_CPI_CYCLE src/cpi_cycle.c)

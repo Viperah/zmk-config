@@ -1,0 +1,43 @@
+menu "DIY Mouse"
+
+config DIY_MOUSE_HALL_BUTTONS
+    bool "DIY mouse Hall-effect main buttons"
+    depends on ADC
+    depends on ZMK_POINTING
+    default n
+    help
+      Poll two ADC Hall sensors and emit left/right mouse button events.
+
+config DIY_MOUSE_HALL_SAMPLE_INTERVAL_US
+    int "Hall button sample interval in microseconds"
+    depends on DIY_MOUSE_HALL_BUTTONS
+    default 1000
+
+config DIY_MOUSE_HALL_BOOT_CALIBRATION_DELAY_MS
+    int "Hall button boot calibration delay in milliseconds"
+    depends on DIY_MOUSE_HALL_BUTTONS
+    default 500
+
+config DIY_MOUSE_HALL_BOOT_CALIBRATION_SAMPLES
+    int "Hall button boot calibration samples"
+    depends on DIY_MOUSE_HALL_BUTTONS
+    default 64
+
+config DIY_MOUSE_HALL_PRESS_DELTA
+    int "Hall button press delta from boot baseline"
+    depends on DIY_MOUSE_HALL_BUTTONS
+    default 60
+
+config DIY_MOUSE_HALL_RELEASE_DELTA
+    int "Hall button release delta from boot baseline"
+    depends on DIY_MOUSE_HALL_BUTTONS
+    default 30
+
+config DIY_MOUSE_CPI_CYCLE
+    bool "DIY mouse PAW3395 CPI cycle behavior"
+    depends on PAW3395
+    default n
+    help
+      Adds a keymap behavior that cycles the PAW3395 CPI setting.
+
+endmenu
