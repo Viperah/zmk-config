@@ -1,2 +1,2 @@
-﻿zephyr_library()
-zephyr_library_sources(src/hall_debug.c)
+zephyr_library()
+zephyr_library_sources_ifdef(CONFIG_DIY_MOUSE_HALL_DEBUG src/hall_debug.c)
