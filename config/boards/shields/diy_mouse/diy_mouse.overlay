@@ -1,7 +1,5 @@
 #include <dt-bindings/zmk/matrix_transform.h>
 #include <dt-bindings/gpio/gpio.h>
-#include <zephyr/dt-bindings/adc/adc.h>
-#include <zephyr/dt-bindings/adc/nrf-saadc.h>
 #include <zephyr/dt-bindings/input/input-event-codes.h>
 #include <zephyr/dt-bindings/pinctrl/nrf-pinctrl.h>
 
@@ -9,10 +7,6 @@
     chosen {
         zmk,kscan = &kscan0;
         zmk,matrix-transform = &default_transform;
-    };
-
-    zephyr,user {
-        io-channels = <&adc 7>, <&adc 5>;
     };
 
     kscan0: kscan {
@@ -45,11 +39,12 @@
         a-gpios = <&gpio1 15 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>; /* D18 / P1.15 / Encoder A */
         b-gpios = <&gpio1 13 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>; /* D15 / P1.13 / Encoder B */
         steps = <24>;
-        status = "okay";
+        status = "disabled";
     };
 
     sensors: sensors {
         compatible = "zmk,keymap-sensors";
+        status = "disabled";
         sensors = <&scroll_encoder>;
         triggers-per-rotation = <24>;
     };
@@ -93,29 +88,5 @@
         x-input-code = <INPUT_REL_X>;
         y-input-code = <INPUT_REL_Y>;
         force-awake;
-    };
-};
-
-&adc {
-    status = "okay";
-    #address-cells = <1>;
-    #size-cells = <0>;
-
-    channel@7 {
-        reg = <7>;
-        zephyr,gain = "ADC_GAIN_1_6";
-        zephyr,reference = "ADC_REF_INTERNAL";
-        zephyr,acquisition-time = <ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS, 40)>;
-        zephyr,input-positive = <NRF_SAADC_AIN7>; /* D21 / P0.31 / AIN7 */
-        zephyr,resolution = <12>;
-    };
-
-    channel@5 {
-        reg = <5>;
-        zephyr,gain = "ADC_GAIN_1_6";
-        zephyr,reference = "ADC_REF_INTERNAL";
-        zephyr,acquisition-time = <ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS, 40)>;
-        zephyr,input-positive = <NRF_SAADC_AIN5>; /* D20 / P0.29 / AIN5 */
-        zephyr,resolution = <12>;
     };
 };
