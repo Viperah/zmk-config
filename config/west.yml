@@ -4,12 +4,26 @@ manifest:
       url-base: https://github.com/zmkfirmware
     - name: badjeff
       url-base: https://github.com/badjeff
+    - name: nrfconnect
+      url-base: https://github.com/nrfconnect
 
   projects:
     - name: zmk
       remote: zmkfirmware
       revision: main
       import: app/west.yml
+    - name: zmk-feature-split-esb
+      remote: badjeff
+      revision: 02d790c888bc5746ff1bbf7cbdeaa702235bcf3f
+    - name: sdk-nrf
+      remote: badjeff
+      revision: v3.1-branch+zmk-fixes
+      path: nrf
+    - name: nrfxlib
+      remote: nrfconnect
+      revision: v3.1-branch
+      repo-path: sdk-nrfxlib
+      path: nrfxlib
     - name: zmk-paw3395-driver
       remote: badjeff
       revision: 0bbdb875864d10dec1480cd380d9d48bb16945ef

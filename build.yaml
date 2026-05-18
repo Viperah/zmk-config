@@ -1,3 +1,5 @@
 include:
   - board: "nice_nano//zmk"
-    shield: diy_mouse
+    shield: diy_mouse_esb_mouse
+  - board: "nice_nano//zmk"
+    shield: diy_mouse_esb_dongle

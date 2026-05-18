@@ -4,3 +4,26 @@ config ZMK_KEYBOARD_NAME
     default "DIY Mouse"
 
 endif
+
+if SHIELD_DIY_MOUSE_ESB_MOUSE
+
+config ZMK_KEYBOARD_NAME
+    default "DIY Mouse ESB"
+
+config ZMK_SPLIT
+    default y
+
+endif
+
+if SHIELD_DIY_MOUSE_ESB_DONGLE
+
+config ZMK_KEYBOARD_NAME
+    default "DIY Mouse Dongle"
+
+config ZMK_SPLIT
+    default y
+
+config ZMK_SPLIT_ROLE_CENTRAL
+    default y
+
+endif
