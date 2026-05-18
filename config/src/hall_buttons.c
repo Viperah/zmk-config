@@ -1,9 +1,11 @@
 #include <zephyr/drivers/adc.h>
+#include <zephyr/input/input.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
-#include <zmk/endpoints.h>
-#include <zmk/hid.h>
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+
+#include <zmk/pointing/input_split.h>
 
 #include <errno.h>
 #include <stdlib.h>
@@ -24,14 +26,17 @@ static const struct adc_dt_spec hall_adcs[] = {
 
 struct hall_button {
     const char *label;
-    zmk_mouse_button_t mouse_button;
+    uint16_t input_code;
     int16_t baseline;
+    int32_t filtered;
+    uint8_t press_samples;
+    uint8_t release_samples;
     bool pressed;
 };
 
 static struct hall_button hall_buttons[] = {
-    {.label = "left", .mouse_button = 0},
-    {.label = "right", .mouse_button = 1},
+    {.label = "left", .input_code = INPUT_BTN_0},
+    {.label = "right", .input_code = INPUT_BTN_1},
 };
 
 static int read_hall_raw(const struct adc_dt_spec *adc, int16_t *raw) {
@@ -83,6 +88,7 @@ static int calibrate_hall_button(size_t index) {
 
     hall_buttons[index].baseline =
         (int16_t)(sum / CONFIG_DIY_MOUSE_HALL_BOOT_CALIBRATION_SAMPLES);
+    hall_buttons[index].filtered = hall_buttons[index].baseline;
 
     LOG_INF("%s Hall baseline raw=%d", hall_buttons[index].label,
             hall_buttons[index].baseline);
@@ -91,43 +97,55 @@ static int calibrate_hall_button(size_t index) {
 }
 
 static void send_hall_button(size_t index, bool pressed) {
-    int err;
-
-    if (pressed) {
-        err = zmk_hid_mouse_button_press(hall_buttons[index].mouse_button);
-    } else {
-        err = zmk_hid_mouse_button_release(hall_buttons[index].mouse_button);
-    }
-
+    int err = zmk_input_split_report_peripheral_event(
+        CONFIG_DIY_MOUSE_HALL_INPUT_SPLIT_REG, INPUT_EV_KEY, hall_buttons[index].input_code,
+        pressed ? 1 : 0, true);
     if (err) {
-        LOG_ERR("%s Hall mouse button %s failed: %d", hall_buttons[index].label,
-                pressed ? "press" : "release", err);
-        return;
-    }
-
-    err = zmk_endpoint_send_mouse_report();
-    if (err) {
-        LOG_WRN("%s Hall mouse report send failed: %d", hall_buttons[index].label, err);
+        LOG_WRN("%s Hall split report failed: %d", hall_buttons[index].label, err);
     }
 }
 
 static void process_hall_button(size_t index) {
+    struct hall_button *button = &hall_buttons[index];
     int16_t raw = 0;
     int err = read_hall_raw(&hall_adcs[index], &raw);
     if (err) {
-        LOG_ERR("%s Hall read failed: %d", hall_buttons[index].label, err);
+        LOG_ERR("%s Hall read failed: %d", button->label, err);
         return;
     }
 
-    int32_t delta = abs(raw - hall_buttons[index].baseline);
+    if (CONFIG_DIY_MOUSE_HALL_FILTER_SHIFT > 0) {
+        button->filtered +=
+            (raw - button->filtered) >> CONFIG_DIY_MOUSE_HALL_FILTER_SHIFT;
+    } else {
+        button->filtered = raw;
+    }
 
-    if (!hall_buttons[index].pressed && delta >= CONFIG_DIY_MOUSE_HALL_PRESS_DELTA) {
-        hall_buttons[index].pressed = true;
-        LOG_INF("%s Hall pressed raw=%d delta=%d", hall_buttons[index].label, raw, delta);
+    int32_t delta = abs(button->filtered - button->baseline);
+
+    if (!button->pressed && delta >= CONFIG_DIY_MOUSE_HALL_PRESS_DELTA) {
+        button->press_samples++;
+        button->release_samples = 0;
+    } else if (button->pressed && delta <= CONFIG_DIY_MOUSE_HALL_RELEASE_DELTA) {
+        button->release_samples++;
+        button->press_samples = 0;
+    } else {
+        button->press_samples = 0;
+        button->release_samples = 0;
+    }
+
+    if (!button->pressed && button->press_samples >= CONFIG_DIY_MOUSE_HALL_PRESS_SAMPLES) {
+        button->pressed = true;
+        button->press_samples = 0;
+        LOG_INF("%s Hall pressed raw=%d filtered=%d delta=%d", button->label, raw,
+                button->filtered, delta);
         send_hall_button(index, true);
-    } else if (hall_buttons[index].pressed && delta <= CONFIG_DIY_MOUSE_HALL_RELEASE_DELTA) {
-        hall_buttons[index].pressed = false;
-        LOG_INF("%s Hall released raw=%d delta=%d", hall_buttons[index].label, raw, delta);
+    } else if (button->pressed &&
+               button->release_samples >= CONFIG_DIY_MOUSE_HALL_RELEASE_SAMPLES) {
+        button->pressed = false;
+        button->release_samples = 0;
+        LOG_INF("%s Hall released raw=%d filtered=%d delta=%d", button->label, raw,
+                button->filtered, delta);
         send_hall_button(index, false);
     }
 }
@@ -152,9 +170,9 @@ static void hall_buttons_thread(void) {
         }
     }
 
-    LOG_INF("Hall buttons active: press_delta=%d release_delta=%d interval_us=%d",
+    LOG_INF("Hall buttons active: press_delta=%d release_delta=%d interval_us=%d filter_shift=%d",
             CONFIG_DIY_MOUSE_HALL_PRESS_DELTA, CONFIG_DIY_MOUSE_HALL_RELEASE_DELTA,
-            CONFIG_DIY_MOUSE_HALL_SAMPLE_INTERVAL_US);
+            CONFIG_DIY_MOUSE_HALL_SAMPLE_INTERVAL_US, CONFIG_DIY_MOUSE_HALL_FILTER_SHIFT);
 
     while (1) {
         for (size_t i = 0; i < ARRAY_SIZE(hall_buttons); i++) {

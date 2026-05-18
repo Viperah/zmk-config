@@ -33,6 +33,29 @@ config DIY_MOUSE_HALL_RELEASE_DELTA
     depends on DIY_MOUSE_HALL_BUTTONS
     default 30
 
+config DIY_MOUSE_HALL_FILTER_SHIFT
+    int "Hall button IIR filter shift"
+    depends on DIY_MOUSE_HALL_BUTTONS
+    default 1
+    help
+      Applies a light IIR filter: filtered += (raw - filtered) / 2^shift.
+      Set to 0 to disable filtering. Higher values are smoother but slower.
+
+config DIY_MOUSE_HALL_PRESS_SAMPLES
+    int "Consecutive Hall samples required to press"
+    depends on DIY_MOUSE_HALL_BUTTONS
+    default 2
+
+config DIY_MOUSE_HALL_RELEASE_SAMPLES
+    int "Consecutive Hall samples required to release"
+    depends on DIY_MOUSE_HALL_BUTTONS
+    default 2
+
+config DIY_MOUSE_HALL_INPUT_SPLIT_REG
+    int "ESB input-split register for Hall mouse buttons"
+    depends on DIY_MOUSE_HALL_BUTTONS
+    default 2
+
 config DIY_MOUSE_CPI_CYCLE
     bool "DIY mouse PAW3395 CPI cycle behavior"
     depends on PAW3395

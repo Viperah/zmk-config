@@ -23,6 +23,18 @@
         compatible = "zmk,input-listener";
         device = <&paw3395_split>;
     };
+
+    hall_buttons_esb_listener {
+        compatible = "zmk,input-listener";
+        device = <&hall_buttons_split>;
+    };
+
+    split_inputs {
+        hall_buttons_split: hall_buttons_split@2 {
+            compatible = "zmk,input-split";
+            reg = <2>;
+        };
+    };
 };
 
 #include "diy_mouse_esb_addr.dtsi"

@@ -20,6 +20,10 @@
         rows = <1>;
         map = <RC(0,0)>;
     };
+
+    zephyr,user {
+        io-channels = <&adc 7>, <&adc 5>; /* Hall 1 D21/P0.31/AIN7, Hall 2 D20/P0.29/AIN5 */
+    };
 };
 
 #include "diy_mouse_esb_addr.dtsi"
@@ -68,4 +72,8 @@
         y-input-code = <INPUT_REL_Y>;
         force-awake;
     };
+};
+
+&adc {
+    status = "okay";
 };
