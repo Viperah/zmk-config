@@ -1,7 +1,5 @@
 include:
   - board: "nice_nano//zmk"
     shield: diy_mouse_esb_mouse
-    snippet: zmk-usb-logging
   - board: "nice_nano//zmk"
     shield: diy_mouse_esb_dongle
-    snippet: zmk-usb-logging
