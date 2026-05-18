@@ -29,6 +29,25 @@
         compatible = "diy,mouse-hall-buttons";
         status = "okay";
     };
+
+    digital_buttons_input: digital_buttons_input {
+        compatible = "diy,mouse-digital-buttons";
+        status = "okay";
+        input-gpios
+            = <&gpio1 0 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>   /* D6 / P1.00 / middle click */
+            , <&gpio1 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>   /* D8 / P1.04 / side back */
+            , <&gpio1 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>   /* D9 / P1.06 / side forward */
+            ;
+        button-codes = <INPUT_BTN_2 INPUT_BTN_3 INPUT_BTN_4>;
+        dpi-gpios = <&gpio0 11 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>; /* D7 / P0.11 / DPI */
+    };
+
+    scroll_wheel_input: scroll_wheel_input {
+        compatible = "diy,mouse-scroll-wheel";
+        status = "okay";
+        a-gpios = <&gpio1 15 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>; /* D18 / P1.15 / Encoder A */
+        b-gpios = <&gpio1 13 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>; /* D15 / P1.13 / Encoder B */
+    };
 };
 
 #include "diy_mouse_esb_addr.dtsi"
@@ -40,6 +59,14 @@
 
 &hall_buttons_split {
     device = <&hall_buttons_input>;
+};
+
+&digital_buttons_split {
+    device = <&digital_buttons_input>;
+};
+
+&scroll_wheel_split {
+    device = <&scroll_wheel_input>;
 };
 
 &pinctrl {

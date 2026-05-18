@@ -1,0 +1,16 @@
+# Copyright (c) 2026
+# SPDX-License-Identifier: MIT
+
+description: DIY mouse quadrature scroll wheel input device.
+
+compatible: "diy,mouse-scroll-wheel"
+
+include: base.yaml
+
+properties:
+  a-gpios:
+    type: phandle-array
+    required: true
+  b-gpios:
+    type: phandle-array
+    required: true

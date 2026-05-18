@@ -28,6 +28,16 @@
         compatible = "zmk,input-listener";
         device = <&hall_buttons_split>;
     };
+
+    digital_buttons_esb_listener {
+        compatible = "zmk,input-listener";
+        device = <&digital_buttons_split>;
+    };
+
+    scroll_wheel_esb_listener {
+        compatible = "zmk,input-listener";
+        device = <&scroll_wheel_split>;
+    };
 };
 
 #include "diy_mouse_esb_addr.dtsi"

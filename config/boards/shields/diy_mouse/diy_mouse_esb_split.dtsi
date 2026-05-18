@@ -12,5 +12,15 @@
             compatible = "zmk,input-split";
             reg = <2>;
         };
+
+        digital_buttons_split: digital_buttons_split@3 {
+            compatible = "zmk,input-split";
+            reg = <3>;
+        };
+
+        scroll_wheel_split: scroll_wheel_split@4 {
+            compatible = "zmk,input-split";
+            reg = <4>;
+        };
     };
 };

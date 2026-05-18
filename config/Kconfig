@@ -51,6 +51,34 @@ config DIY_MOUSE_HALL_RELEASE_SAMPLES
     depends on DIY_MOUSE_HALL_BUTTONS
     default 2
 
+config DIY_MOUSE_DIGITAL_INPUTS
+    bool "DIY mouse digital buttons and scroll wheel"
+    depends on GPIO
+    depends on ZMK_POINTING
+    default n
+    help
+      Poll normal mouse buttons, a local CPI button, and the quadrature scroll encoder.
+
+config DIY_MOUSE_DIGITAL_SAMPLE_INTERVAL_US
+    int "Digital input sample interval in microseconds"
+    depends on DIY_MOUSE_DIGITAL_INPUTS
+    default 1000
+
+config DIY_MOUSE_DIGITAL_DEBOUNCE_SAMPLES
+    int "Consecutive samples required for digital button state changes"
+    depends on DIY_MOUSE_DIGITAL_INPUTS
+    default 5
+
+config DIY_MOUSE_SCROLL_EDGES_PER_REPORT
+    int "Quadrature edges per scroll report"
+    depends on DIY_MOUSE_DIGITAL_INPUTS
+    default 2
+
+config DIY_MOUSE_SCROLL_STEP
+    int "Scroll wheel report value per trigger"
+    depends on DIY_MOUSE_DIGITAL_INPUTS
+    default 1
+
 config DIY_MOUSE_CPI_CYCLE
     bool "DIY mouse PAW3395 CPI cycle behavior"
     depends on PAW3395

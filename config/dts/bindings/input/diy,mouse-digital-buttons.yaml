@@ -1,0 +1,19 @@
+# Copyright (c) 2026
+# SPDX-License-Identifier: MIT
+
+description: DIY mouse normal button input device.
+
+compatible: "diy,mouse-digital-buttons"
+
+include: base.yaml
+
+properties:
+  input-gpios:
+    type: phandle-array
+    required: true
+  button-codes:
+    type: array
+    required: true
+  dpi-gpios:
+    type: phandle-array
+    required: true
