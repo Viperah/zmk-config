@@ -51,11 +51,6 @@ config DIY_MOUSE_HALL_RELEASE_SAMPLES
     depends on DIY_MOUSE_HALL_BUTTONS
     default 2
 
-config DIY_MOUSE_HALL_INPUT_SPLIT_REG
-    int "ESB input-split register for Hall mouse buttons"
-    depends on DIY_MOUSE_HALL_BUTTONS
-    default 2
-
 config DIY_MOUSE_CPI_CYCLE
     bool "DIY mouse PAW3395 CPI cycle behavior"
     depends on PAW3395

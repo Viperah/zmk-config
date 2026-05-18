@@ -24,6 +24,11 @@
     zephyr,user {
         io-channels = <&adc 7>, <&adc 5>; /* Hall 1 D21/P0.31/AIN7, Hall 2 D20/P0.29/AIN5 */
     };
+
+    hall_buttons_input: hall_buttons_input {
+        compatible = "diy,mouse-hall-buttons";
+        status = "okay";
+    };
 };
 
 #include "diy_mouse_esb_addr.dtsi"
@@ -31,6 +36,10 @@
 
 &paw3395_split {
     device = <&paw3395>;
+};
+
+&hall_buttons_split {
+    device = <&hall_buttons_input>;
 };
 
 &pinctrl {

@@ -1,11 +1,10 @@
 #include <zephyr/drivers/adc.h>
+#include <zephyr/device.h>
 #include <zephyr/input/input.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
 #include <zephyr/dt-bindings/input/input-event-codes.h>
-
-#include <zmk/pointing/input_split.h>
 
 #include <errno.h>
 #include <stdlib.h>
@@ -13,6 +12,7 @@
 LOG_MODULE_REGISTER(diy_mouse_hall_buttons, LOG_LEVEL_INF);
 
 #define HALL_ADC_NODE DT_PATH(zephyr_user)
+#define HALL_INPUT_NODE DT_NODELABEL(hall_buttons_input)
 
 BUILD_ASSERT(DT_NODE_HAS_PROP(HALL_ADC_NODE, io_channels),
              "Missing Hall ADC io-channels in /zephyr,user");
@@ -23,6 +23,16 @@ static const struct adc_dt_spec hall_adcs[] = {
     ADC_DT_SPEC_GET_BY_IDX(HALL_ADC_NODE, 0), /* Hall 1: D21 / P0.31 / AIN7 */
     ADC_DT_SPEC_GET_BY_IDX(HALL_ADC_NODE, 1), /* Hall 2: D20 / P0.29 / AIN5 */
 };
+
+static int hall_buttons_input_init(const struct device *dev) {
+    ARG_UNUSED(dev);
+    return 0;
+}
+
+DEVICE_DT_DEFINE(HALL_INPUT_NODE, hall_buttons_input_init, NULL, NULL, NULL, POST_KERNEL,
+                 CONFIG_INPUT_INIT_PRIORITY, NULL);
+
+static const struct device *hall_input_dev = DEVICE_DT_GET(HALL_INPUT_NODE);
 
 struct hall_button {
     const char *label;
@@ -97,11 +107,10 @@ static int calibrate_hall_button(size_t index) {
 }
 
 static void send_hall_button(size_t index, bool pressed) {
-    int err = zmk_input_split_report_peripheral_event(
-        CONFIG_DIY_MOUSE_HALL_INPUT_SPLIT_REG, INPUT_EV_KEY, hall_buttons[index].input_code,
-        pressed ? 1 : 0, true);
+    int err = input_report(hall_input_dev, INPUT_EV_KEY, hall_buttons[index].input_code,
+                           pressed ? 1 : 0, true, K_NO_WAIT);
     if (err) {
-        LOG_WRN("%s Hall split report failed: %d", hall_buttons[index].label, err);
+        LOG_WRN("%s Hall input report failed: %d", hall_buttons[index].label, err);
     }
 }
 
@@ -121,7 +130,7 @@ static void process_hall_button(size_t index) {
         button->filtered = raw;
     }
 
-    int32_t delta = abs(button->filtered - button->baseline);
+    int32_t delta = labs(button->filtered - button->baseline);
 
     if (!button->pressed && delta >= CONFIG_DIY_MOUSE_HALL_PRESS_DELTA) {
         button->press_samples++;
